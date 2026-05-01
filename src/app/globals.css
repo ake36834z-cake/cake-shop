@@ -1,0 +1,38 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+/* 確保輸入框在深色模式下有良好的對比度 */
+@media (prefers-color-scheme: dark) {
+  input, textarea, select {
+    background-color: #1a1a1a !important;
+    color: white !important;
+    border-color: #333 !important;
+  }
+  
+  input::placeholder, textarea::placeholder {
+    color: #666 !important;
+  }
+}

@@ -1,0 +1,8 @@
+node_modules/
+.next/
+*.json
+!package.json
+!package-lock.json
+!tsconfig.json
+*.mov
+*.bak
