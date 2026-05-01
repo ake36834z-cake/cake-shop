@@ -100,7 +100,7 @@ export const cakes: Cake[] = [
     image: '/images/flavors/pandan/hero-pandan.jpg',
     images: [
       '/images/flavors/pandan/hero-pandan.jpg',
-      '/images/flavors/pandan/video-pandan.mov',
+      '/images/flavors/pandan/video-pandan-small.mp4',
       '/images/flavors/pandan/5A911864.png',
       '/images/flavors/pandan/IMG_5100.jpg',
       '/images/flavors/pandan/IMG_5127.jpg',
