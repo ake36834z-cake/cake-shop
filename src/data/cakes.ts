@@ -100,19 +100,19 @@ export const cakes: Cake[] = [
     name: '椰香斑斕戚風 (6吋)',
     description: '100% 新鮮斑蘭葉榨汁萃取，加入經典 Kara 椰漿，品嚐自然散發出的「類芋頭」清香。',
     price: 320,
-    image: '/images/flavors/pandan/hero-pandan.jpg',
+    image: '/images/flavors/pandan/main.jpg',
     images: [
-      '/images/flavors/pandan/hero-pandan.jpg',
-      '/images/flavors/pandan/video-pandan-small.mp4',
-      '/images/flavors/pandan/5A911864.png',
-      '/images/flavors/pandan/IMG_5100.jpg',
-      '/images/flavors/pandan/IMG_5127.jpg',
-      '/images/flavors/pandan/IMG_7820.jpg',
-      '/images/flavors/pandan/IMG_7821.jpg',
+      '/images/flavors/pandan/main.jpg',
+      '/images/flavors/pandan/5A911864.PNG',
+      '/images/flavors/pandan/IMG_5100.JPG',
+      '/images/flavors/pandan/IMG_5127.JPG',
+      '/images/flavors/pandan/IMG_7820.JPG',
+      '/images/flavors/pandan/IMG_7821.JPG',
       '/images/flavors/pandan/IMG_2781.JPG',
       '/images/flavors/pandan/IMG_2780.JPG',
       '/images/flavors/pandan/IMG_2934.JPG',
-      '/images/flavors/pandan/IMG_2971.JPG'
+      '/images/flavors/pandan/IMG_2971.JPG',
+      '/images/flavors/pandan/licensed-image.jpeg'
     ],
     category: '適合小朋友',
     type: 'six-inch',
@@ -123,13 +123,15 @@ export const cakes: Cake[] = [
     name: '草莓天使 (6吋)',
     description: '100% 天然草莓果泥製作，像雲朵般輕盈的口感中帶著微酸甜的粉紅氣息。',
     price: 360,
-    image: '/images/flavors/strawberry/真草莓戚風1 .jpg',
+    image: '/images/flavors/strawberry/main.jpg',
     images: [
-      '/images/flavors/strawberry/真草莓戚風1 .jpg',
+      '/images/flavors/strawberry/main.jpg',
+      '/images/flavors/strawberry/真草莓戚風1.jpg',
       '/images/flavors/strawberry/真草莓戚風2.jpg',
       '/images/flavors/strawberry/真草莓戚風3.jpg',
       '/images/flavors/strawberry/真草莓戚風4.png',
-      '/images/flavors/strawberry/真草莓戚風5.png'
+      '/images/flavors/strawberry/真草莓戚風5.png',
+      '/images/flavors/strawberry/草莓天使戚風.jpg'
     ],
     category: '適合小朋友',
     type: 'six-inch',
@@ -257,12 +259,13 @@ export const cakes: Cake[] = [
     image: '/images/products/three-box/IMG_4133.jpg',
     images: [
       '/images/products/three-box/IMG_4133.jpg',
-      '/images/products/three-box/經典大三元戚風禮盒 .jpg',
+      '/images/products/three-box/經典大三元戚風禮盒.jpg',
       '/images/products/three-box/大三元形象圖.JPG',
       '/images/products/three-box/IMG_2652.JPG',
       '/images/products/three-box/IMG_8763 2.JPG',
       '/images/products/three-box/IMG_8764.JPG',
-      '/images/products/three-box/IMG_8765.JPG'
+      '/images/products/three-box/IMG_8765.JPG',
+      '/images/products/three-box/IMG_5164.jpg'
     ],
     category: '綜合系列',
     type: 'combo',
