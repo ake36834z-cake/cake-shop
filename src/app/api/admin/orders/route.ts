@@ -11,7 +11,7 @@ export async function GET() {
 
     const sheets = google.sheets({ version: 'v4', auth });
     // 使用您最新的試算表 ID
-    const spreadsheetId = '1iJ5nYAt5iXadiQSL0a3f1mM9_tk0Br9Iuei6LieSuYk';
+    const spreadsheetId = '1K4cyhSkg5Fp6FeFIf0P6ezAV5dYHufIm5IKW1gdfBh4';
     
     // 讀取「工作表1」的資料（或根據您的分頁名稱調整）
     const response = await sheets.spreadsheets.values.get({
