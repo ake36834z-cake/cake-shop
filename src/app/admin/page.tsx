@@ -17,7 +17,33 @@ export default function AdminPage() {
   const [cakes, setCakes] = useState(initialCakes);
   const [orders, setOrders] = useState<any[]>([]);
   const [loadingOrders, setLoadingOrders] = useState(false);
+  const [loadingProducts, setLoadingProducts] = useState(false);
   const [editingCake, setEditingCake] = useState<any>(null);
+
+  // 取得商品資料
+  const fetchProducts = async () => {
+    setLoadingProducts(true);
+    try {
+      const res = await fetch('/api/admin/products');
+      const data = await res.json();
+      if (data.products && data.products.length > 0) {
+        const updatedCakes = initialCakes.map(sc => {
+          const liveData = data.products.find((p: any) => p.id === sc.id);
+          return liveData ? { 
+            ...sc, 
+            price: liveData.price, 
+            originalPrice: liveData.originalPrice,
+            category: liveData.category || sc.category 
+          } : sc;
+        });
+        setCakes(updatedCakes);
+      }
+    } catch (err) {
+      console.error('Failed to fetch products');
+    } finally {
+      setLoadingProducts(false);
+    }
+  };
 
   // 檢查登入狀態
   useEffect(() => {
@@ -26,6 +52,12 @@ export default function AdminPage() {
       setIsAuthenticated(true);
     }
   }, []);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchProducts();
+    }
+  }, [isAuthenticated]);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,26 +94,32 @@ export default function AdminPage() {
   useEffect(() => {
     if (isAuthenticated && activeTab === 'orders') fetchOrders();
   }, [activeTab, isAuthenticated]);
-const handleUpdatePrice = async (id: string, newPrice: number, originalPrice?: number) => {
-  try {
-    const res = await fetch('/api/admin/products', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id, price: newPrice, originalPrice }),
-    });
-    const data = await res.json();
-    if (data.success) {
-      alert('價格與原價已成功更新至 Google Sheets！');
-      // 重新整理頁面上的蛋糕列表 (可選：fetch 最新資料或直接更新 local state)
-      setCakes(cakes.map(c => c.id === id ? { ...c, price: newPrice, originalPrice } : c));
-      setEditingCake(null);
-    } else {
-      alert('更新失敗：' + data.error);
+
+  const handleUpdatePrice = async (id: string, newPrice: number, originalPrice?: number) => {
+    try {
+      const currentCake = cakes.find(c => c.id === id);
+      const res = await fetch('/api/admin/products', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          id, 
+          price: newPrice, 
+          originalPrice,
+          category: currentCake?.category 
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert('價格與原價已成功更新至 Google Sheets！');
+        fetchProducts();
+        setEditingCake(null);
+      } else {
+        alert('更新失敗：' + data.error);
+      }
+    } catch (err) {
+      alert('發生錯誤，請稍後再試');
     }
-  } catch (err) {
-    alert('發生錯誤，請稍後再試');
-  }
-};
+  };
 
 // ... (在 return 的 Modal 裡修改點擊事件)
 // 我會往下尋找 Modal 的儲存按鈕位置進行修改
