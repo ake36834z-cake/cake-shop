@@ -4,18 +4,23 @@ import path from 'path';
 
 const SHEET_ID = '1K4cyhSkg5Fp6FeFIf0P6ezAV5dYHufIm5IKW1gdfBh4';
 
+// 取得認證物件的通用函數
+function getGoogleAuth() {
+  const credentials = process.env.GOOGLE_SHEETS_CREDENTIALS 
+    ? JSON.parse(process.env.GOOGLE_SHEETS_CREDENTIALS)
+    : undefined;
+
+  return new google.auth.GoogleAuth({
+    credentials,
+    keyFile: credentials ? undefined : path.join(process.cwd(), 'google-sheets-key.json'),
+    scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+  });
+}
+
 // 取得商品列表
 export async function GET() {
   try {
-    const credentials = process.env.GOOGLE_SHEETS_CREDENTIALS 
-      ? JSON.parse(process.env.GOOGLE_SHEETS_CREDENTIALS)
-      : undefined;
-
-    const auth = new google.auth.GoogleAuth({
-      credentials,
-      keyFile: credentials ? undefined : path.join(process.cwd(), 'google-sheets-key.json'),
-      scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
-    });
+    const auth = getGoogleAuth();
     const sheets = google.sheets({ version: 'v4', auth });
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: SHEET_ID,
@@ -30,7 +35,7 @@ export async function GET() {
       name: row[1],
       price: parseInt(row[2]),
       originalPrice: row[3] ? parseInt(row[3]) : undefined,
-      category: row[3] // 這裡原本代碼可能寫錯了，但我們先保留邏輯
+      category: row[3] 
     }));
 
     return NextResponse.json({ products });
@@ -43,17 +48,7 @@ export async function GET() {
 export async function PATCH(req: Request) {
   try {
     const { id, price, originalPrice } = await req.json();
-    
-    // 優先從環境變數讀取 JSON 字串
-    const credentials = process.env.GOOGLE_SHEETS_CREDENTIALS 
-      ? JSON.parse(process.env.GOOGLE_SHEETS_CREDENTIALS)
-      : undefined;
-
-    const auth = new google.auth.GoogleAuth({
-      credentials,
-      keyFile: credentials ? undefined : path.join(process.cwd(), 'google-sheets-key.json'),
-      scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-    });
+    const auth = getGoogleAuth();
     const sheets = google.sheets({ version: 'v4', auth });
 
     // 1. 先找出該 ID 在哪一列

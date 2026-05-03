@@ -2,18 +2,24 @@ import { google } from 'googleapis';
 import { NextResponse } from 'next/server';
 import path from 'path';
 
+function getGoogleAuth() {
+  const credentials = process.env.GOOGLE_SHEETS_CREDENTIALS 
+    ? JSON.parse(process.env.GOOGLE_SHEETS_CREDENTIALS)
+    : undefined;
+
+  return new google.auth.GoogleAuth({
+    credentials,
+    keyFile: credentials ? undefined : path.join(process.cwd(), 'google-sheets-key.json'),
+    scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
+  });
+}
+
 export async function GET() {
   try {
-    const auth = new google.auth.GoogleAuth({
-      keyFile: path.join(process.cwd(), 'google-sheets-key.json'),
-      scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
-    });
-
+    const auth = getGoogleAuth();
     const sheets = google.sheets({ version: 'v4', auth });
-    // 使用您最新的試算表 ID
     const spreadsheetId = '1K4cyhSkg5Fp6FeFIf0P6ezAV5dYHufIm5IKW1gdfBh4';
     
-    // 讀取「工作表1」的資料（或根據您的分頁名稱調整）
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId,
       range: '工作表1!A:L', 
@@ -24,7 +30,6 @@ export async function GET() {
       return NextResponse.json({ orders: [] });
     }
 
-    // 將二維陣列轉為物件陣列
     const headers = rows[0];
     const orders = rows.slice(1).map((row, index) => {
       const order: any = { id: index };
@@ -32,7 +37,7 @@ export async function GET() {
         order[header] = row[i];
       });
       return order;
-    }).reverse(); // 最新的訂單排前面
+    }).reverse();
 
     return NextResponse.json({ orders });
   } catch (error: any) {
