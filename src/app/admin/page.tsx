@@ -120,9 +120,9 @@ export default function AdminPage() {
         <div className="p-8">
           <div className="flex items-center space-x-2 text-pink-500 mb-2">
             <div className="w-8 h-8 bg-pink-500 rounded-lg flex items-center justify-center text-white font-bold italic">S</div>
-            <span className="font-bold text-xl tracking-tight text-gray-900">SUNS CAKE</span>
+            <span className="font-bold text-xl tracking-tight text-gray-900">SUNS CAKE 🔒</span>
           </div>
-          <p className="text-xs text-gray-400 font-medium">商家管理系統 v2.0</p>
+          <p className="text-xs text-gray-400 font-medium">安全管理系統 v2.1</p>
         </div>
         
         <nav className="mt-4 px-4 space-y-1">
