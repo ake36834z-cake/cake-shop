@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
-import { Camera, ShoppingCart, MessageCircle } from 'lucide-react';
+import { Instagram, ShoppingCart, MessageCircle } from 'lucide-react';
 
 export default function Navbar() {
   const { totalItems } = useCart();
@@ -37,16 +37,10 @@ export default function Navbar() {
               href="https://www.instagram.com/tw_chiffon_2022?igsh=MWF2ZjQ3cHhndW11OA%3D%3D&utm_source=qr" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="hover:scale-110 transition-transform"
+              className="hover:scale-110 transition-transform text-gray-400 hover:text-pink-500"
               title="Instagram"
             >
-              <div className="w-6 h-6 relative overflow-hidden rounded-md border border-gray-100">
-                <img 
-                  src="/images/instagram-icon.jpg" 
-                  alt="Instagram" 
-                  className="w-full h-full object-cover"
-                />
-              </div>
+              <Instagram size={22} />
             </a>
             <a 
               href="https://lin.ee/4QXT46O" 
