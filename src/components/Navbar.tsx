@@ -26,9 +26,6 @@ export default function Navbar() {
             <Link href="/about" className="text-gray-600 hover:text-pink-500 px-3 py-2 text-sm font-medium transition-colors">
               關於我們
             </Link>
-            <Link href="/admin" className="text-gray-600 hover:text-pink-500 px-3 py-2 text-sm font-medium transition-colors">
-              管理後台
-            </Link>
           </div>
 
           {/* Social and Cart Icons */}
