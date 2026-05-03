@@ -62,12 +62,30 @@ export default function AdminPage() {
   useEffect(() => {
     if (isAuthenticated && activeTab === 'orders') fetchOrders();
   }, [activeTab, isAuthenticated]);
+const handleUpdatePrice = async (id: string, newPrice: number, originalPrice?: number) => {
+  try {
+    const res = await fetch('/api/admin/products', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, price: newPrice, originalPrice }),
+    });
+    const data = await res.json();
+    if (data.success) {
+      alert('價格與原價已成功更新至 Google Sheets！');
+      // 重新整理頁面上的蛋糕列表 (可選：fetch 最新資料或直接更新 local state)
+      setCakes(cakes.map(c => c.id === id ? { ...c, price: newPrice, originalPrice } : c));
+      setEditingCake(null);
+    } else {
+      alert('更新失敗：' + data.error);
+    }
+  } catch (err) {
+    alert('發生錯誤，請稍後再試');
+  }
+};
 
-  const handleUpdatePrice = (id: string, newPrice: number) => {
-    setCakes(cakes.map(c => c.id === id ? { ...c, price: newPrice } : c));
-    setEditingCake(null);
-    alert('價格已暫時更新（前端模擬），實際更新需串接後端寫入功能。');
-  };
+// ... (在 return 的 Modal 裡修改點擊事件)
+// 我會往下尋找 Modal 的儲存按鈕位置進行修改
+
 
   // 如果未驗證，顯示登入畫面
   if (!isAuthenticated) {
@@ -296,6 +314,7 @@ export default function AdminPage() {
                   <label className="block text-sm font-bold text-gray-400 mb-2 px-1">原價 (選填)</label>
                   <input 
                     type="number" 
+                    id="edit-original-price"
                     defaultValue={editingCake.originalPrice}
                     className="w-full bg-gray-50 border-none rounded-2xl px-6 py-4 font-bold text-gray-400 focus:ring-2 focus:ring-pink-500 transition-all"
                   />
@@ -304,7 +323,8 @@ export default function AdminPage() {
               <button 
                 onClick={() => {
                   const p = (document.getElementById('edit-price') as HTMLInputElement).value;
-                  handleUpdatePrice(editingCake.id, parseInt(p));
+                  const op = (document.getElementById('edit-original-price') as HTMLInputElement).value;
+                  handleUpdatePrice(editingCake.id, parseInt(p), op ? parseInt(op) : undefined);
                 }}
                 className="w-full bg-pink-500 text-white py-5 rounded-3xl font-black text-lg shadow-xl shadow-pink-100 hover:bg-pink-600 hover:scale-[0.98] active:scale-95 transition-all mt-4 flex items-center justify-center space-x-2"
               >
