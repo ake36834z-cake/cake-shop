@@ -37,10 +37,10 @@ export default function Navbar() {
               href="https://www.instagram.com/tw_chiffon_2022?igsh=MWF2ZjQ3cHhndW11OA%3D%3D&utm_source=qr" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="hover:scale-110 transition-transform text-gray-400 hover:text-pink-500"
+              className="hover:scale-110 transition-transform text-pink-400 hover:text-pink-600"
               title="Instagram"
             >
-              <Instagram size={22} />
+              <Instagram size={24} />
             </a>
             <a 
               href="https://lin.ee/4QXT46O" 
