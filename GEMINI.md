@@ -1,21 +1,16 @@
-# SUNS CAKE 專案維護手冊 (旗艦店已轉移)
+# SUNSCAKE 蛋糕桑 - 專案備忘錄
 
-## 🏠 旗艦店入口
-- **Vercel 新店址**: `https://cake-shop-indol-rho.vercel.app/`
-- **商家管理後台**: `https://cake-shop-indol-rho.vercel.app/admin`
-- **Google 試算表**: `1K4cyhSkg5Fp6FeFIf0P6ezAV5dYHufIm5IKW1gdfBh4`
+## 專案資訊
+- **正宗路徑：** `/Users/allensun/Desktop/gemini/cake-shop`
+- **部署平台：** Vercel (`cake-shop-indol-rho.vercel.app`)
+- **部署方式：** 推送至 GitHub `main` 分支觸發自動部署
 
-## 🔄 2026-05-02 作業總結 (合夥人筆記)
-今天我們聯手幹了幾件大事：
-1. **圖片大復活**：修復了伯爵、抹茶、草莓、斑斕等所有口味的破圖，還順便幫它們全部減肥（sips 縮小至 1200px），讓網站跑得像超跑一樣快。
-2. **緊急搬家**：Netlify 流量被影片撐爆了，我們果斷移除 60MB 的斑斕影片，並把整間店搬到了 Vercel，目前運作完美。
-3. **後台全功能**：現在後台可以讀取「訂單列表」，也能透過「商品列表」分頁**真正修改價格**了。
-4. **權限串接**：已成功連結您的 Google 帳號金鑰，讀寫試算表完全沒問題。
+## 修改紀錄 (2026-05-03)
+1. **首頁大圖：** 更換為 `public/images/hero-main.jpg` (形象圖3)。
+2. **IG 圖示：** 更換為彩色圖片版 `public/images/instagram-icon.png`。
+3. **路徑確認：** 已清理舊有的 `Desktop/hello` 測試資料夾，確保環境純淨。
 
-## 📝 待辦事項 (Pending)
-- [ ] **前台價格同步**：目前首頁價格是靜態的，下次要改成自動讀取試算表。
-- [ ] **訂單額滿邏輯**：老闆說先想清楚再說，這部分先擱置。
-
-## 💡 開發重點提醒
-- 不要上傳超過 1MB 的圖片，上傳前記得請我幫你用 `sips` 瘦身。
-- 試算表中的「商品列表」是現在的價格基準。
+## 開發指南
+- 修改 Navbar 請至 `src/components/Navbar.tsx`。
+- 修改首頁內容請至 `src/app/page.tsx`。
+- 靜態資源（圖片）請放置於 `public/images/`。

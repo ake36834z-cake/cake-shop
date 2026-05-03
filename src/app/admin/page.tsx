@@ -9,11 +9,40 @@ import {
 import Image from 'next/image';
 
 export default function AdminPage() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [password, setPassword] = useState('');
+  const [loginError, setLoginError] = useState(false);
   const [activeTab, setActiveTab] = useState<'products' | 'orders'>('products');
   const [cakes, setCakes] = useState(initialCakes);
   const [orders, setOrders] = useState<any[]>([]);
   const [loadingOrders, setLoadingOrders] = useState(false);
   const [editingCake, setEditingCake] = useState<any>(null);
+
+  // 檢查登入狀態
+  useEffect(() => {
+    const auth = sessionStorage.getItem('admin_auth');
+    if (auth === 'true') {
+      setIsAuthenticated(true);
+    }
+  }, []);
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    // 密碼設定為 sunscake888
+    if (password === 'sunscake888') {
+      setIsAuthenticated(true);
+      sessionStorage.setItem('admin_auth', 'true');
+      setLoginError(false);
+    } else {
+      setLoginError(true);
+      setPassword('');
+    }
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    sessionStorage.removeItem('admin_auth');
+  };
 
   // 取得訂單資料
   const fetchOrders = async () => {
@@ -30,15 +59,59 @@ export default function AdminPage() {
   };
 
   useEffect(() => {
-    if (activeTab === 'orders') fetchOrders();
-  }, [activeTab]);
+    if (isAuthenticated && activeTab === 'orders') fetchOrders();
+  }, [activeTab, isAuthenticated]);
 
   const handleUpdatePrice = (id: string, newPrice: number) => {
     setCakes(cakes.map(c => c.id === id ? { ...c, price: newPrice } : c));
     setEditingCake(null);
-    // 這裡未來可以串接 API 更新後端檔案
     alert('價格已暫時更新（前端模擬），實際更新需串接後端寫入功能。');
   };
+
+  // 如果未驗證，顯示登入畫面
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-[#FDF7F7] flex items-center justify-center p-4">
+        <div className="bg-white w-full max-w-md rounded-[40px] p-10 shadow-2xl border border-pink-50 animate-in fade-in zoom-in duration-300">
+          <div className="text-center mb-10">
+            <div className="w-20 h-20 bg-pink-500 rounded-3xl flex items-center justify-center text-white font-bold text-4xl italic mx-auto mb-6 shadow-xl shadow-pink-100">S</div>
+            <h1 className="text-2xl font-black text-gray-900 mb-2">管理員登入</h1>
+            <p className="text-gray-400 font-medium">請輸入後台管理密碼</p>
+          </div>
+
+          <form onSubmit={handleLogin} className="space-y-6">
+            <div>
+              <input 
+                type="password" 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="請輸入密碼"
+                className={`w-full bg-gray-50 border-2 rounded-2xl px-6 py-4 font-bold text-gray-900 focus:ring-4 focus:ring-pink-100 transition-all outline-none text-center tracking-widest ${
+                  loginError ? 'border-red-200 animate-shake' : 'border-transparent focus:border-pink-500'
+                }`}
+                autoFocus
+              />
+              {loginError && (
+                <p className="text-red-500 text-sm font-bold mt-3 text-center">密碼錯誤，請再試一次</p>
+              )}
+            </div>
+            <button 
+              type="submit"
+              className="w-full bg-pink-500 text-white py-5 rounded-3xl font-black text-lg shadow-xl shadow-pink-100 hover:bg-pink-600 hover:scale-[0.98] active:scale-95 transition-all flex items-center justify-center"
+            >
+              進入後台
+            </button>
+          </form>
+          
+          <div className="mt-8 text-center">
+            <Link href="/" className="text-gray-400 hover:text-pink-500 text-sm font-bold transition-colors">
+              ← 返回首頁
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen bg-[#FDF7F7]">
@@ -71,9 +144,12 @@ export default function AdminPage() {
             <Package className="mr-3" size={20} />
             訂單列表
           </button>
-          <button className="flex items-center w-full px-4 py-3 text-gray-400 rounded-xl font-bold hover:bg-gray-50">
-            <Settings className="mr-3" size={20} />
-            商店設定
+          <button 
+            onClick={handleLogout}
+            className="flex items-center w-full px-4 py-3 text-gray-400 rounded-xl font-bold hover:bg-red-50 hover:text-red-500 transition-all"
+          >
+            <RefreshCw className="mr-3 rotate-45" size={20} />
+            登出系統
           </button>
         </nav>
       </aside>
