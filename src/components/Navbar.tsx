@@ -14,7 +14,7 @@ export default function Navbar() {
           {/* Logo */}
           <div className="flex-shrink-0 flex items-center">
             <Link href="/" className="text-2xl font-bold text-pink-500 tracking-tight">
-              SUNSCAKE<span className="text-gray-800 ml-1">蛋糕桑</span>
+              SUNSCAKE<span className="text-gray-800 ml-1">蛋糕桑(驗證中)</span>
             </Link>
           </div>
 
