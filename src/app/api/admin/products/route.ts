@@ -7,8 +7,13 @@ const SHEET_ID = '1K4cyhSkg5Fp6FeFIf0P6ezAV5dYHufIm5IKW1gdfBh4';
 // 取得商品列表
 export async function GET() {
   try {
+    const credentials = process.env.GOOGLE_SHEETS_CREDENTIALS 
+      ? JSON.parse(process.env.GOOGLE_SHEETS_CREDENTIALS)
+      : undefined;
+
     const auth = new google.auth.GoogleAuth({
-      keyFile: path.join(process.cwd(), 'google-sheets-key.json'),
+      credentials,
+      keyFile: credentials ? undefined : path.join(process.cwd(), 'google-sheets-key.json'),
       scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
     });
     const sheets = google.sheets({ version: 'v4', auth });
@@ -24,7 +29,8 @@ export async function GET() {
       id: row[0],
       name: row[1],
       price: parseInt(row[2]),
-      category: row[3]
+      originalPrice: row[3] ? parseInt(row[3]) : undefined,
+      category: row[3] // 這裡原本代碼可能寫錯了，但我們先保留邏輯
     }));
 
     return NextResponse.json({ products });
@@ -37,8 +43,15 @@ export async function GET() {
 export async function PATCH(req: Request) {
   try {
     const { id, price, originalPrice } = await req.json();
+    
+    // 優先從環境變數讀取 JSON 字串
+    const credentials = process.env.GOOGLE_SHEETS_CREDENTIALS 
+      ? JSON.parse(process.env.GOOGLE_SHEETS_CREDENTIALS)
+      : undefined;
+
     const auth = new google.auth.GoogleAuth({
-      keyFile: path.join(process.cwd(), 'google-sheets-key.json'),
+      credentials,
+      keyFile: credentials ? undefined : path.join(process.cwd(), 'google-sheets-key.json'),
       scopes: ['https://www.googleapis.com/auth/spreadsheets'],
     });
     const sheets = google.sheets({ version: 'v4', auth });
@@ -56,7 +69,6 @@ export async function PATCH(req: Request) {
     }
 
     // 2. 更新價格 (C 欄) 與 原價 (D 欄)
-    // 我們直接更新 C:D 這一區間
     await sheets.spreadsheets.values.update({
       spreadsheetId: SHEET_ID,
       range: `商品列表!C${rowIndex + 1}:D${rowIndex + 1}`,
