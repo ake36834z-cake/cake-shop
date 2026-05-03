@@ -1,15 +1,13 @@
 import { google } from 'googleapis';
 import { NextResponse } from 'next/server';
-import path from 'path';
 
 function getGoogleAuth() {
-  const credentials = process.env.GOOGLE_SHEETS_CREDENTIALS 
-    ? JSON.parse(process.env.GOOGLE_SHEETS_CREDENTIALS)
-    : undefined;
-
+  const credentialsJson = process.env.GOOGLE_SHEETS_CREDENTIALS;
+  if (!credentialsJson) {
+    throw new Error('系統錯誤：GOOGLE_SHEETS_CREDENTIALS 環境變數缺失。');
+  }
   return new google.auth.GoogleAuth({
-    credentials,
-    keyFile: credentials ? undefined : path.join(process.cwd(), 'google-sheets-key.json'),
+    credentials: JSON.parse(credentialsJson),
     scopes: ['https://www.googleapis.com/auth/spreadsheets'],
   });
 }
@@ -17,7 +15,7 @@ function getGoogleAuth() {
 export async function POST(req: Request) {
   try {
     const data = await req.json();
-    const { name, phone, items, total, shipping, pickupDate, note } = data;
+    const { name, phone, items, total, shipping, note } = data;
 
     const auth = getGoogleAuth();
     const sheets = google.sheets({ version: 'v4', auth });
@@ -45,7 +43,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ success: true });
   } catch (error: any) {
-    console.error('Google Sheets Error:', error);
+    console.error('Google Sheets Error:', error.message);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }
