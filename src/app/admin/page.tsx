@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { cakes as initialCakes } from '@/data/cakes';
 import { 
   Plus, Edit, Trash2, LayoutDashboard, Package, Settings, 
