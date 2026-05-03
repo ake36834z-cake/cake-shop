@@ -1,8 +1,31 @@
+import { useState, useEffect } from "react";
 import Image from "next/image";
-import { cakes } from "@/data/cakes";
+import { cakes as staticCakes } from "@/data/cakes";
 import ProductCard from "@/components/ProductCard";
 
 export default function Home() {
+  const [cakes, setCakes] = useState(staticCakes);
+
+  useEffect(() => {
+    const loadCakes = async () => {
+      try {
+        const res = await fetch('/api/admin/products');
+        const data = await res.json();
+        if (data.products && data.products.length > 0) {
+          // 這裡將 API 回傳的 Sheets 資料與靜態資料合併（補齊圖片等資訊）
+          const updatedCakes = staticCakes.map(sc => {
+            const liveData = data.products.find((p: any) => p.id === sc.id);
+            return liveData ? { ...sc, price: liveData.price, originalPrice: liveData.originalPrice } : sc;
+          });
+          setCakes(updatedCakes);
+        }
+      } catch (err) {
+        console.error("無法載入即時價格:", err);
+      }
+    };
+    loadCakes();
+  }, []);
+
   return (
     <div className="pb-20">
       {/* Hero Section */}
@@ -41,13 +64,6 @@ export default function Home() {
           <div>
             <h2 className="text-3xl font-bold text-gray-900 mb-2">人氣蛋糕</h2>
             <p className="text-gray-500">探索我們最受歡迎的精選甜點</p>
-          </div>
-          <div className="hidden md:flex space-x-4">
-            {['全部', '6吋整顆', '綜合禮盒', '切片系列', '生日蛋糕'].map((cat) => (
-              <button key={cat} className="px-4 py-2 rounded-full border border-gray-200 text-sm text-gray-600 hover:border-pink-500 hover:text-pink-500 transition-colors">
-                {cat}
-              </button>
-            ))}
           </div>
         </div>
 

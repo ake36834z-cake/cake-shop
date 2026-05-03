@@ -1,41 +1,40 @@
 import { google } from 'googleapis';
 import { NextResponse } from 'next/server';
-import path from 'path';
 
 const SHEET_ID = '1K4cyhSkg5Fp6FeFIf0P6ezAV5dYHufIm5IKW1gdfBh4';
 
-// 取得認證物件的通用函數
+// 取得認證物件 - 僅使用環境變數
 function getGoogleAuth() {
-  const credentials = process.env.GOOGLE_SHEETS_CREDENTIALS 
-    ? JSON.parse(process.env.GOOGLE_SHEETS_CREDENTIALS)
-    : undefined;
-
+  const credentialsJson = process.env.GOOGLE_SHEETS_CREDENTIALS;
+  if (!credentialsJson) {
+    throw new Error('GOOGLE_SHEETS_CREDENTIALS 缺失');
+  }
   return new google.auth.GoogleAuth({
-    credentials,
-    keyFile: credentials ? undefined : path.join(process.cwd(), 'google-sheets-key.json'),
+    credentials: JSON.parse(credentialsJson),
     scopes: ['https://www.googleapis.com/auth/spreadsheets'],
   });
 }
 
-// 取得商品列表
 export async function GET() {
   try {
     const auth = getGoogleAuth();
     const sheets = google.sheets({ version: 'v4', auth });
+    // 讀取 A 到 E 欄位 (E 可能放類別)
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: SHEET_ID,
-      range: '商品列表!A:D',
+      range: '商品列表!A:E',
     });
 
     const rows = response.data.values;
     if (!rows) return NextResponse.json({ products: [] });
 
+    // 排除標題列，映射資料
     const products = rows.slice(1).map(row => ({
       id: row[0],
       name: row[1],
-      price: parseInt(row[2]),
+      price: parseInt(row[2]) || 0,
       originalPrice: row[3] ? parseInt(row[3]) : undefined,
-      category: row[3] 
+      category: row[4] || '' // 分類移到 E 欄
     }));
 
     return NextResponse.json({ products });
@@ -44,14 +43,12 @@ export async function GET() {
   }
 }
 
-// 更新單一商品價格與原價
 export async function PATCH(req: Request) {
   try {
     const { id, price, originalPrice } = await req.json();
     const auth = getGoogleAuth();
     const sheets = google.sheets({ version: 'v4', auth });
 
-    // 1. 先找出該 ID 在哪一列
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: SHEET_ID,
       range: '商品列表!A:A',
@@ -63,7 +60,7 @@ export async function PATCH(req: Request) {
       throw new Error('找不到該商品');
     }
 
-    // 2. 更新價格 (C 欄) 與 原價 (D 欄)
+    // 更新 C 欄 (價格) 與 D 欄 (原價)
     await sheets.spreadsheets.values.update({
       spreadsheetId: SHEET_ID,
       range: `商品列表!C${rowIndex + 1}:D${rowIndex + 1}`,
@@ -75,7 +72,6 @@ export async function PATCH(req: Request) {
 
     return NextResponse.json({ success: true });
   } catch (error: any) {
-    console.error('Update Error:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
