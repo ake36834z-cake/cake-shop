@@ -9,7 +9,7 @@ export default function Home() {
       <section className="relative h-[600px] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <Image
-            src="/images/flavors/pandan/hero-pandan.jpg"
+            src="/images/hero-main.jpg"
             alt="SUNSCAKE 蛋糕桑 職人手作戚風蛋糕"
             fill
             className="object-cover brightness-[0.85]"
