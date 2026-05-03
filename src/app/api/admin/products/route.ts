@@ -19,16 +19,16 @@ export async function GET() {
   try {
     const auth = getGoogleAuth();
     const sheets = google.sheets({ version: 'v4', auth });
-    // 讀取 A 到 E 欄位 (E 可能放類別)
+    
+    // 不指定分頁名稱，預設讀取第一個分頁
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: SHEET_ID,
-      range: '商品列表!A:E',
+      range: 'A:E', 
     });
 
     const rows = response.data.values;
     if (!rows) return NextResponse.json({ products: [] });
 
-    // 排除標題列，映射資料
     const products = rows.slice(1).map(row => {
       const id = row[0];
       const name = row[1];
@@ -37,18 +37,15 @@ export async function GET() {
       let originalPrice: number | undefined = undefined;
       let category = '';
 
-      // 防呆邏輯：判斷 D 欄 (row[3]) 是原價還是分類
       const col3Value = row[3] || '';
       const isCol3Numeric = !isNaN(Number(col3Value)) && col3Value !== '';
 
       if (isCol3Numeric) {
-        // 如果 D 欄是數字，它是原價
         originalPrice = parseInt(col3Value);
-        category = row[4] || ''; // 分類在 E 欄
+        category = row[4] || '';
       } else {
-        // 如果 D 欄不是數字，它是分類 (舊結構)
         category = col3Value;
-        originalPrice = undefined; // 原價尚未設定
+        originalPrice = undefined;
       }
 
       return { id, name, price, originalPrice, category };
@@ -66,37 +63,34 @@ export async function PATCH(req: Request) {
     const auth = getGoogleAuth();
     const sheets = google.sheets({ version: 'v4', auth });
 
-    // 1. 先抓取目前的資料，確認 rowIndex 並保留分類資訊
+    // 先抓取目前所有資料
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: SHEET_ID,
-      range: '商品列表!A:E',
+      range: 'A:E',
     });
     const rows = response.data.values;
     const rowIndex = rows?.findIndex(row => row[0] === id);
 
     if (rowIndex === undefined || rowIndex === -1) {
-      throw new Error('找不到該商品');
+      throw new Error(`找不到商品 ID: ${id}`);
     }
 
     const currentRow = rows![rowIndex];
-    // 判斷目前的結構
     const col3Value = currentRow[3] || '';
     const isCol3Numeric = !isNaN(Number(col3Value)) && col3Value !== '';
 
     let updateRange = '';
     let updateValues = [];
 
+    // 這裡我們不加分頁名稱，讓它更新預設分頁
     if (isCol3Numeric || currentRow.length > 4) {
-      // 已經是新結構 (A:E)
-      updateRange = `商品列表!C${rowIndex + 1}:E${rowIndex + 1}`;
+      updateRange = `C${rowIndex + 1}:E${rowIndex + 1}`;
       updateValues = [[price, originalPrice || '', category || currentRow[4] || '']];
     } else {
-      // 還是舊結構 (A:D)，我們順便幫它升級成新結構 (A:E)
-      updateRange = `商品列表!C${rowIndex + 1}:E${rowIndex + 1}`;
+      updateRange = `C${rowIndex + 1}:E${rowIndex + 1}`;
       updateValues = [[price, originalPrice || '', category || col3Value || '']];
     }
 
-    // 更新資料
     await sheets.spreadsheets.values.update({
       spreadsheetId: SHEET_ID,
       range: updateRange,
@@ -108,6 +102,9 @@ export async function PATCH(req: Request) {
 
     return NextResponse.json({ success: true });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ 
+      error: `更新失敗: ${error.message}`,
+      details: error.response?.data?.error || 'N/A'
+    }, { status: 500 });
   }
 }
