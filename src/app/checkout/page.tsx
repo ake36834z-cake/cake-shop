@@ -68,8 +68,8 @@ export default function CheckoutPage() {
     
     // 使用 encodeURIComponent 確保所有字元（含換行）都能被正確解析
     const encodedMsg = encodeURIComponent(rawMsg);
-    // 使用最穩定的 LINE 分享協議，確保電腦版與手機版都能正確帶入訊息
-    const lineUrl = `https://line.me/R/share?text=${encodedMsg}`;
+    // 使用正確的官方 LINE ID (@003ffkxr)
+    const lineUrl = `https://line.me/R/oaMessage/@003ffkxr/?${encodedMsg}`;
 
     return (
       <div className="max-w-3xl mx-auto px-4 py-20 text-center">
