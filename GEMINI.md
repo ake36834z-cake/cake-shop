@@ -6,13 +6,13 @@
 - **部署方式：** 推送至 GitHub `main` 分支觸發自動部署
 
 ## 修改紀錄 (2026-05-04) - 進度補正
-1. **Google Sheets 連結：** 已經更換全新金鑰，確認 `google_credentials.json` 連線正常，不再噴 `account not found`。
-2. **原價功能實作：** 
+1. **Google Sheets 連結：** 已更換新金鑰，並在 v111 版本中徹底封死「檔案路徑」讀取邏輯，改為純環境變數物件讀取，解決 `ENOENT` 錯誤。
+2. **[新] v111 部署：** 已推送到 GitHub，等待 Vercel 自動部署完成。
+3. **原價功能實作：** 
     - Google Sheets `商品列表` 標題已更新為 `ID, 商品名稱, 價格, 原價, 分類`。
-    - API 端 (`app/api/admin/products/route.ts`) 已支援 `originalPrice` 讀取與寫入。
-    - 前端 `ProductCard.tsx` 與 `products/[id]/page.tsx` 已加入 `line-through` 刪節線顯示原價。
-    - 後台管理 (`app/admin/page.tsx`) 已加入原價編輯欄位。
-3. **部署準備：** 代碼已在本地驗證完成。
+    - API 端已支援 `originalPrice` (row[3]) 讀寫。
+    - 前端與後台均已支援原價顯示與編輯。
+
 
 ## 修改紀錄 (2026-05-03)
 1. **首頁大圖：** 更換為 `public/images/hero-main.jpg` (形象圖3)。

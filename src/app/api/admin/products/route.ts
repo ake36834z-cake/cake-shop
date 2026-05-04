@@ -66,17 +66,18 @@ export async function PATCH(req: Request) {
 
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: SHEET_ID,
-      range: 'A:E',
+      range: '商品列表!A:E', // 修正：加上工作表名稱
     });
     const rows = response.data.values;
     const rowIndex = rows?.findIndex(row => row[0] === id);
 
     if (rowIndex === undefined || rowIndex === -1) {
-      throw new Error(`找不到 ID: ${id}`);
+      throw new Error(`找不到 ID: ${id} (在 '商品列表' 工作表中)`);
     }
 
     // 更新範圍固定為 C 到 E (價格, 原價, 分類)
-    const updateRange = `C${rowIndex + 1}:E${rowIndex + 1}`;
+    // 加上工作表名稱
+    const updateRange = `商品列表!C${rowIndex + 1}:E${rowIndex + 1}`;
     const updateValues = [[price, originalPrice || '', category || '']];
 
     await sheets.spreadsheets.values.update({
@@ -86,11 +87,11 @@ export async function PATCH(req: Request) {
       requestBody: { values: updateValues }
     });
 
-    return NextResponse.json({ success: true, version: 'v108' });
-  } catch (error: any) {
-    return NextResponse.json({ 
-      error: `PATCH錯誤[v108]: ${error.message}`,
+    return NextResponse.json({ success: true, version: 'v112' });
+    } catch (error: any) {
+    return NextResponse.json({
+      error: `PATCH錯誤[v112]: ${error.message}`,
       details: error.response?.data?.error || 'N/A'
     }, { status: 500 });
-  }
-}
+    }
+    }
