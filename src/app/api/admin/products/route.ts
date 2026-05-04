@@ -6,57 +6,58 @@ const SHEET_ID = '1K4cyhSkg5Fp6FeFIf0P6ezAV5dYHufIm5IKW1gdfBh4';
 function getGoogleAuth() {
   const credentialsJson = process.env.GOOGLE_SHEETS_CREDENTIALS;
   if (!credentialsJson) {
-    throw new Error('DEPLOYMENT_V106: GOOGLE_SHEETS_CREDENTIALS 缺失');
+    throw new Error('DEPLOYMENT_V111: GOOGLE_SHEETS_CREDENTIALS 缺失');
   }
-  const credentials = JSON.parse(credentialsJson);
-  
-  // 核心修正：強制刪除可能導致 API 庫去讀取檔案的屬性
-  delete credentials.key_file;
-  delete credentials.key_path;
 
-  return new google.auth.GoogleAuth({
-    credentials,
-    scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-  });
+  try {
+    const credentials = JSON.parse(credentialsJson);
+
+    // 徹底清除所有可能導致檔案讀取的欄位
+    const cleanCredentials = {
+      client_email: credentials.client_email,
+      private_key: credentials.private_key?.replace(/\\n/g, '\n'), // 處理可能的換行符號問題
+      project_id: credentials.project_id,
+    };
+
+    return new google.auth.GoogleAuth({
+      credentials: cleanCredentials,
+      scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+    });
+  } catch (e: any) {
+    throw new Error(`JSON 解析失敗: ${e.message}`);
+  }
 }
 
 export async function GET() {
   try {
     const auth = getGoogleAuth();
     const sheets = google.sheets({ version: 'v4', auth });
-    
+
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: SHEET_ID,
-      range: 'A:E', 
+      range: '商品列表!A:E', // 加上工作表名稱確保精確
     });
 
     const rows = response.data.values;
-    if (!rows) return NextResponse.json({ products: [], version: 'v106' });
+    if (!rows) return NextResponse.json({ products: [], version: 'v111' });
 
     const products = rows.slice(1).map(row => {
       const id = row[0];
       const name = row[1];
       const price = parseInt(row[2]) || 0;
-      let originalPrice: number | undefined = undefined;
-      let category = '';
-      const col3Value = row[3] || '';
-      const isCol3Numeric = !isNaN(Number(col3Value)) && col3Value !== '';
-      if (isCol3Numeric) {
-        originalPrice = parseInt(col3Value);
-        category = row[4] || '';
-      } else {
-        category = col3Value;
-        originalPrice = undefined;
-      }
+      const originalPrice = parseInt(row[3]) || undefined;
+      const category = row[4] || '';
       return { id, name, price, originalPrice, category };
     });
 
-    return NextResponse.json({ products, version: 'v106' });
+    return NextResponse.json({ products, version: 'v111-FIXED-PATH' });
   } catch (error: any) {
-    return NextResponse.json({ error: `GET錯誤[v106]: ${error.message}` }, { status: 500 });
+    return NextResponse.json({
+      error: `🔴 這是 v111 版本 🔴 錯誤訊息: ${error.message}`,
+      hint: "如果還噴 ENOENT，請檢查 Vercel Environment Variables 裡面的 JSON 格式是否正確（不要包含 key_file 欄位）"
+    }, { status: 500 });
   }
 }
-
 export async function PATCH(req: Request) {
   try {
     const { id, price, originalPrice, category } = await req.json();
@@ -74,20 +75,9 @@ export async function PATCH(req: Request) {
       throw new Error(`找不到 ID: ${id}`);
     }
 
-    const currentRow = rows![rowIndex];
-    const col3Value = currentRow[3] || '';
-    const isCol3Numeric = !isNaN(Number(col3Value)) && col3Value !== '';
-
-    let updateRange = '';
-    let updateValues = [];
-
-    if (isCol3Numeric || currentRow.length > 4) {
-      updateRange = `C${rowIndex + 1}:E${rowIndex + 1}`;
-      updateValues = [[price, originalPrice || '', category || currentRow[4] || '']];
-    } else {
-      updateRange = `C${rowIndex + 1}:E${rowIndex + 1}`;
-      updateValues = [[price, originalPrice || '', category || col3Value || '']];
-    }
+    // 更新範圍固定為 C 到 E (價格, 原價, 分類)
+    const updateRange = `C${rowIndex + 1}:E${rowIndex + 1}`;
+    const updateValues = [[price, originalPrice || '', category || '']];
 
     await sheets.spreadsheets.values.update({
       spreadsheetId: SHEET_ID,
@@ -96,10 +86,10 @@ export async function PATCH(req: Request) {
       requestBody: { values: updateValues }
     });
 
-    return NextResponse.json({ success: true, version: 'v106' });
+    return NextResponse.json({ success: true, version: 'v108' });
   } catch (error: any) {
     return NextResponse.json({ 
-      error: `PATCH錯誤[v106]: ${error.message}`,
+      error: `PATCH錯誤[v108]: ${error.message}`,
       details: error.response?.data?.error || 'N/A'
     }, { status: 500 });
   }
