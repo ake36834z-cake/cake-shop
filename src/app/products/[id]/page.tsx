@@ -189,7 +189,16 @@ export default function ProductDetailPage() {
                   </div>
                 </div>
               </div>
-              <div className="pt-4 border-t border-pink-100 mt-4 ml-8">
+              <div className="pt-4 border-t border-pink-100 mt-4 ml-8 space-y-3">
+                <a 
+                  href="https://www.instagram.com/sunscake888/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center space-x-2 text-pink-600 hover:text-pink-700 transition-colors group"
+                >
+                  <Image src="/images/instagram-icon.png" alt="IG" width={18} height={18} />
+                  <span className="text-sm font-bold border-b border-pink-200 group-hover:border-pink-600">更多造型可以參考IG</span>
+                </a>
                 <p className="text-xs text-pink-700 leading-relaxed italic">
                   ⚠️ 小提醒：天然動物鮮奶油容易受熱融化，建議攜帶保冰袋。路程15分鐘以上需冷氣車運送，中途不停留。
                 </p>
