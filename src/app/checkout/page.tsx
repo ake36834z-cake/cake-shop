@@ -63,9 +63,13 @@ export default function CheckoutPage() {
   };
 
   if (isOrdered) {
-    const itemsText = cart.map(item => `${item.name} x ${item.quantity}`).join('%0A');
-    const lineMsg = `訂單確認：${formData.name}%0A電話：${formData.phone}%0A項目：%0A${itemsText}%0A總金額：${finalTotal}%0A配送：${shippingMethod === 'ship-711' ? '7-11冷凍' : shippingMethod === 'ship-cat' ? '黑貓冷凍' : '自取'}%0A備註：${formData.note || '無'}`;
-    const lineUrl = `https://line.me/R/msg/text/?${lineMsg}`;
+    const itemsText = cart.map(item => `${item.name} x ${item.quantity}`).join('\n');
+    const rawMsg = `訂單確認：${formData.name}\n電話：${formData.phone}\n項目：\n${itemsText}\n總金額：${finalTotal}\n配送：${shippingMethod === 'ship-711' ? '7-11冷凍' : shippingMethod === 'ship-cat' ? '黑貓冷凍' : '自取'}\n備註：${formData.note || '無'}`;
+    
+    // 使用 encodeURIComponent 確保所有字元（含換行）都能被正確解析
+    const encodedMsg = encodeURIComponent(rawMsg);
+    // 使用 LINE 官方帳號對話框導向格式 (ID: @412lnhsh)
+    const lineUrl = `https://line.me/R/oaMessage/@412lnhsh/?${encodedMsg}`;
 
     return (
       <div className="max-w-3xl mx-auto px-4 py-20 text-center">
