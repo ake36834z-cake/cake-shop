@@ -63,7 +63,6 @@ export const cakes: Cake[] = [
     originalPrice: 350,
     image: '/images/flavors/chocolate/main.jpg',
     images: [
-      '/images/flavors/chocolate/main.jpg',
       '/images/flavors/chocolate/經典巧克力 形象圖.jpg',
       '/images/flavors/chocolate/經典巧克力.JPG',
       '/images/flavors/chocolate/巧克力 形象圖.JPG',
