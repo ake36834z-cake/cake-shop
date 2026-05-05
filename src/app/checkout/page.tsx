@@ -10,6 +10,17 @@ export default function CheckoutPage() {
   const [isOrdered, setIsOrdered] = useState(false);
   const [shippingMethod, setShippingMethod] = useState('ship-self');
 
+  // 加入 Esc 鍵監聽，讓客人在成功畫面按 Esc 即可返回修改資料
+  useEffect(() => {
+    const handleEsc = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && isOrdered) {
+        setIsOrdered(false);
+      }
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [isOrdered]);
+
   // Check if there are any pickup-only items in cart
   const hasPickupOnlyItem = cart.some(item => item.id === 'birthday-cream');
 
