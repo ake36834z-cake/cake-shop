@@ -68,12 +68,12 @@ export default function CheckoutPage() {
     
     // 使用 encodeURIComponent 確保所有字元（含換行）都能被正確解析
     const encodedMsg = encodeURIComponent(rawMsg);
-    // 使用最穩定的 LINE 分享協議，這能確保電腦版與手機版都能正確帶入訊息
-    // 雖然電腦版會彈出選擇視窗，但這是目前避免跳轉到 LINE 官網的最穩健作法
-    const lineUrl = `https://line.me/R/share?text=${encodedMsg}`;
+    // 終極方案：使用 LINE 網頁分享外掛格式，這是電腦版瀏覽器最穩定的做法
+    const lineUrl = `https://social-plugins.line.me/lineit/share?text=${encodedMsg}`;
 
     return (
       <div className="max-w-3xl mx-auto px-4 py-20 text-center">
+        <p className="text-[10px] text-gray-300 mb-2">Build: v119</p>
         <div className="bg-green-50 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-8 animate-bounce">
           <CheckCircle size={60} className="text-green-500" />
         </div>
